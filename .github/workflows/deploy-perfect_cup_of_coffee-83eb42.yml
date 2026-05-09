@@ -1,0 +1,29 @@
+name: Deploy perfect_cup_of_coffee-83eb42
+on:
+  push:
+    paths:
+      - 'perfect_cup_of_coffee-83eb42/**'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r perfect_cup_of_coffee-83eb42/requirements.txt -t perfect_cup_of_coffee-83eb42/package/
+      - name: Package
+        run: |
+          cp perfect_cup_of_coffee-83eb42/*.py perfect_cup_of_coffee-83eb42/package/
+          cd perfect_cup_of_coffee-83eb42/package && zip -r ../../perfect_cup_of_coffee-83eb42.zip .
+      - name: Deploy to Lambda
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+        run: |
+          aws lambda update-function-code \
+            --function-name atb-perfect_cup_of_coffee-83eb42 \
+            --zip-file fileb://perfect_cup_of_coffee-83eb42.zip
+          aws lambda publish-version --function-name atb-perfect_cup_of_coffee-83eb42
