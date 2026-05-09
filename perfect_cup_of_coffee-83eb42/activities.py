@@ -267,38 +267,88 @@ async def taste_eval(inp: TasteEvalInput) -> TasteEvalOutput:
         recommendation=recommendation,
     )
 
+# ── Add sugar ─────────────────────────────────────────────────────────────────
+
+SUGAR_AMOUNTS = {
+    "white":  1.0,
+    "brown":  1.0,
+    "raw":    1.0,
+    "honey":  0.5,
+    "syrup":  0.5,
+    "none":   0.0,
+}
+
+SUGAR_NOTES_TEMPLATE = {
+    "white":  "Add {amount} tsp white sugar. Stir well while coffee is still hot to dissolve fully.",
+    "brown":  "Add {amount} tsp brown sugar for a subtle molasses depth. Stir well.",
+    "raw":    "Add {amount} tsp raw/turbinado sugar. Adds a light caramel note; stir until dissolved.",
+    "honey":  "Add {amount} tsp honey. Use a mild variety to avoid overpowering delicate flavours. Stir gently.",
+    "syrup":  "Add {amount} tsp simple syrup for even sweetness without graininess. Stir briefly.",
+    "none":   "No sugar — serve as is.",
+}
+
+NOT_RECOMMENDED_SUGAR = {
+    "cold_brew": ["honey"],
+}
+
+@dataclasses.dataclass
+class AddSugarInput:
+    brew_method: str
+    sugar_preference: str
+
+@dataclasses.dataclass
+class AddSugarOutput:
+    sugar_type: str
+    amount_tsp: float
+    notes: str
+
+@activity.defn
+async def add_sugar(inp: AddSugarInput) -> AddSugarOutput:
+    preference = inp.sugar_preference.lower()
+    if preference not in SUGAR_AMOUNTS:
+        raise ApplicationError(
+            f"Unknown sugar preference: {inp.sugar_preference}. "
+            f"Use one of: {', '.join(sorted(SUGAR_AMOUNTS.keys()))}.",
+            non_retryable=True,
+        )
+    amount = SUGAR_AMOUNTS[preference]
+    note = SUGAR_NOTES_TEMPLATE[preference].format(amount=amount)
+
+    # Method-specific advisory
+    method = inp.brew_method.lower()
+    if preference != "none" and preference in NOT_RECOMMENDED_SUGAR.get(method, []):
+        note += " Note: honey can be difficult to dissolve in cold brew; consider simple syrup instead."
+
+    return AddSugarOutput(sugar_type=preference, amount_tsp=amount, notes=note)
+
 # ── Choose milk ───────────────────────────────────────────────────────────────
 
 MILK_AMOUNTS = {
-    "espresso": 60.0,
-    "moka_pot": 60.0,
-    "pour_over": 40.0,
+    "espresso":    60.0,
+    "moka_pot":    60.0,
+    "pour_over":   40.0,
     "french_press": 40.0,
-    "aeropress": 40.0,
-    "chemex": 40.0,
-    "cold_brew": 80.0,
+    "aeropress":   40.0,
+    "chemex":      40.0,
+    "cold_brew":   80.0,
 }
 
 MILK_TEMPS = {
-    "whole": 65.0,
-    "oat": 60.0,
+    "whole":   65.0,
+    "oat":     60.0,
     "skimmed": 65.0,
-    "almond": 55.0,
-    "soy": 60.0,
-    "none": 0.0,
+    "almond":  55.0,
+    "soy":     60.0,
+    "none":     0.0,
 }
 
 MILK_NOTES_TEMPLATE = {
-    "whole": "Steam to {temp:.0f}°C for a rich, creamy texture. Best for espresso-based drinks.",
-    "oat": "Steam to {temp:.0f}°C. Oat milk froths well and adds a subtle sweetness.",
+    "whole":   "Steam to {temp:.0f}°C for a rich, creamy texture. Best for espresso-based drinks.",
+    "oat":     "Steam to {temp:.0f}°C. Oat milk froths well and adds a subtle sweetness.",
     "skimmed": "Steam to {temp:.0f}°C. Lower fat means less body but fewer calories.",
-    "almond": "Warm to {temp:.0f}°C — do not over-heat as it separates easily. Adds a mild nutty flavour.",
-    "soy": "Steam to {temp:.0f}°C. Soy milk can curdle in acidic light roasts; stir gently.",
-    "none": "No milk — serve black.",
-}
-
-NOT_RECOMMENDED = {
-    "cold_brew": ["whole", "oat", "skimmed", "almond", "soy"],
+    "almond":  "Warm to {temp:.0f}°C — do not over-heat as it separates easily. Adds a mild nutty flavour.",
+    "soy":     "Steam to {temp:.0f}°C. Soy milk can curdle in acidic light roasts; stir gently.",
+    "none":    "No milk — serve black.",
 }
 
 @dataclasses.dataclass
@@ -332,11 +382,9 @@ async def choose_milk(inp: ChooseMilkInput) -> ChooseMilkOutput:
     note_template = MILK_NOTES_TEMPLATE[milk_type]
     notes = note_template.format(temp=temp_c)
 
-    # Override amount for "none"
     if milk_type == "none":
         amount_ml = 0.0
 
-    # Warn if milk is unusual for this method
     if milk_type != "none" and method == "cold_brew":
         notes += " Note: for cold brew, consider adding cold milk directly rather than steaming."
 
