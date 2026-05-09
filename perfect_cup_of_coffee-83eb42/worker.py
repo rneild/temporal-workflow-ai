@@ -5,7 +5,7 @@ from workflow import PerfectCupOfCoffeeWorkflow
 from activities import (
     select_beans, grind_beans, heat_water, prep_brewer,
     dose_coffee, bloom_pour, main_brew, taste_eval,
-    add_sugar, choose_milk,
+    choose_milk,
 )
 
 async def main():
@@ -17,7 +17,7 @@ async def main():
         activities=[
             select_beans, grind_beans, heat_water, prep_brewer,
             dose_coffee, bloom_pour, main_brew, taste_eval,
-            add_sugar, choose_milk,
+            choose_milk,
         ],
     )
     await worker.run()
