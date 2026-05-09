@@ -13,6 +13,7 @@ with workflow.unsafe.imports_passed_through():
         BloomPourInput, BloomPourOutput, bloom_pour,
         MainBrewInput, MainBrewOutput, main_brew,
         TasteEvalInput, TasteEvalOutput, taste_eval,
+        AddSugarInput, AddSugarOutput, add_sugar,
         ChooseMilkInput, ChooseMilkOutput, choose_milk,
     )
 
@@ -24,6 +25,7 @@ class BrewRequest:
     dose_grams: float
     water_ml: float
     milk_preference: str = "none"
+    sugar_preference: str = "none"
 
 @dataclasses.dataclass
 class BrewLog:
@@ -41,6 +43,9 @@ class BrewLog:
     flavour_notes: str
     balance: str
     recommendation: str
+    sugar_type: str
+    sugar_amount_tsp: float
+    sugar_notes: str
     milk_type: str
     milk_amount_ml: float
     milk_temp_c: float
@@ -107,6 +112,12 @@ class PerfectCupOfCoffeeWorkflow:
             start_to_close_timeout=timedelta(seconds=30),
             retry_policy=RETRY,
         )
+        sugar = await workflow.execute_activity(
+            add_sugar,
+            AddSugarInput(brew_method=req.brew_method, sugar_preference=req.sugar_preference),
+            start_to_close_timeout=timedelta(seconds=30),
+            retry_policy=RETRY,
+        )
         milk = await workflow.execute_activity(
             choose_milk,
             ChooseMilkInput(brew_method=req.brew_method, milk_preference=req.milk_preference),
@@ -128,6 +139,9 @@ class PerfectCupOfCoffeeWorkflow:
             flavour_notes=taste.flavour_notes,
             balance=taste.balance,
             recommendation=taste.recommendation,
+            sugar_type=sugar.sugar_type,
+            sugar_amount_tsp=sugar.amount_tsp,
+            sugar_notes=sugar.notes,
             milk_type=milk.milk_type,
             milk_amount_ml=milk.milk_amount_ml,
             milk_temp_c=milk.milk_temp_c,
