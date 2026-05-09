@@ -1,0 +1,29 @@
+name: Deploy simple-greeter-324664
+on:
+  push:
+    paths:
+      - 'simple-greeter-324664/**'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r simple-greeter-324664/requirements.txt -t simple-greeter-324664/package/
+      - name: Package
+        run: |
+          cp simple-greeter-324664/*.py simple-greeter-324664/package/
+          cd simple-greeter-324664/package && zip -r ../../simple-greeter-324664.zip .
+      - name: Deploy to Lambda
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+        run: |
+          aws lambda update-function-code \
+            --function-name atb-simple-greeter-324664 \
+            --zip-file fileb://simple-greeter-324664.zip
+          aws lambda publish-version --function-name atb-simple-greeter-324664
