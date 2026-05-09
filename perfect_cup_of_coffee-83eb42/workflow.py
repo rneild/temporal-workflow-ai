@@ -13,6 +13,7 @@ with workflow.unsafe.imports_passed_through():
         BloomPourInput, BloomPourOutput, bloom_pour,
         MainBrewInput, MainBrewOutput, main_brew,
         TasteEvalInput, TasteEvalOutput, taste_eval,
+        ChooseMilkInput, ChooseMilkOutput, choose_milk,
     )
 
 @dataclasses.dataclass
@@ -22,6 +23,7 @@ class BrewRequest:
     roast_level: str
     dose_grams: float
     water_ml: float
+    milk_preference: str = "none"
 
 @dataclasses.dataclass
 class BrewLog:
@@ -39,6 +41,10 @@ class BrewLog:
     flavour_notes: str
     balance: str
     recommendation: str
+    milk_type: str
+    milk_amount_ml: float
+    milk_temp_c: float
+    milk_notes: str
 
 RETRY = RetryPolicy(maximum_attempts=3, initial_interval=timedelta(seconds=2))
 
@@ -101,6 +107,12 @@ class PerfectCupOfCoffeeWorkflow:
             start_to_close_timeout=timedelta(seconds=30),
             retry_policy=RETRY,
         )
+        milk = await workflow.execute_activity(
+            choose_milk,
+            ChooseMilkInput(brew_method=req.brew_method, milk_preference=req.milk_preference),
+            start_to_close_timeout=timedelta(seconds=30),
+            retry_policy=RETRY,
+        )
         return BrewLog(
             brew_method=req.brew_method,
             bean_origin=req.bean_origin,
@@ -116,4 +128,8 @@ class PerfectCupOfCoffeeWorkflow:
             flavour_notes=taste.flavour_notes,
             balance=taste.balance,
             recommendation=taste.recommendation,
+            milk_type=milk.milk_type,
+            milk_amount_ml=milk.milk_amount_ml,
+            milk_temp_c=milk.milk_temp_c,
+            milk_notes=milk.notes,
         )
