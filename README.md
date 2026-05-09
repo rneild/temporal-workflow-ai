@@ -7,7 +7,7 @@
 | Name | Description | Trigger | Task Queue | Deployed | Docs |
 |------|-------------|---------|------------|----------|------|
 | [hello-world](hello-world-fbb969/) | — | adhoc | `tq-hello-world-fbb969` | — | [README.md](hello-world-fbb969/README.md) |
-| [perfect_cup_of_coffee](perfect_cup_of_coffee-83eb42/) | A step-by-step guided workflow for brewing a perfect cup of coffee, from bean selection through grind, brew, taste evaluation, sugar, and milk choice, producing a structured brew log. | adhoc | `tq-perfect_cup_of_coffee-83eb42` | 2026-05-09 | [README.md](perfect_cup_of_coffee-83eb42/README.md) |
+| [perfect_cup_of_coffee](perfect_cup_of_coffee-83eb42/) | Step-by-step coffee brewing workflow from bean selection through to milk choice, producing a structured BrewLog. | adhoc | `tq-perfect_cup_of_coffee-83eb42` | 2026-05-09 | [README.md](perfect_cup_of_coffee-83eb42/README.md) |
 | [simple-greeter](simple-greeter-324664/) | — | adhoc | `tq-simple-greeter-324664` | — | [README.md](simple-greeter-324664/README.md) |
 
 ## Workflow Details
@@ -28,7 +28,7 @@
 
 ### [perfect_cup_of_coffee](perfect_cup_of_coffee-83eb42/)
 
-A step-by-step guided workflow for brewing a perfect cup of coffee, from bean selection through grind, brew, taste evaluation, sugar, and milk choice, producing a structured brew log.
+Step-by-step coffee brewing workflow from bean selection through to milk choice, producing a structured BrewLog.
 
 | | |
 |---|---|
