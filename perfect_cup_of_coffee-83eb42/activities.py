@@ -267,59 +267,6 @@ async def taste_eval(inp: TasteEvalInput) -> TasteEvalOutput:
         recommendation=recommendation,
     )
 
-# ── Add sugar ─────────────────────────────────────────────────────────────────
-
-SUGAR_AMOUNTS = {
-    "white":  1.0,
-    "brown":  1.0,
-    "raw":    1.0,
-    "honey":  0.5,
-    "syrup":  0.5,
-    "none":   0.0,
-}
-
-SUGAR_NOTES_TEMPLATE = {
-    "white":  "Add {amount} tsp white sugar. Stir well while coffee is still hot to dissolve fully.",
-    "brown":  "Add {amount} tsp brown sugar for a subtle molasses depth. Stir well.",
-    "raw":    "Add {amount} tsp raw/turbinado sugar. Adds a light caramel note; stir until dissolved.",
-    "honey":  "Add {amount} tsp honey. Use a mild variety to avoid overpowering delicate flavours. Stir gently.",
-    "syrup":  "Add {amount} tsp simple syrup for even sweetness without graininess. Stir briefly.",
-    "none":   "No sugar — serve as is.",
-}
-
-NOT_RECOMMENDED_SUGAR = {
-    "cold_brew": ["honey"],
-}
-
-@dataclasses.dataclass
-class AddSugarInput:
-    brew_method: str
-    sugar_preference: str
-
-@dataclasses.dataclass
-class AddSugarOutput:
-    sugar_type: str
-    amount_tsp: float
-    notes: str
-
-@activity.defn
-async def add_sugar(inp: AddSugarInput) -> AddSugarOutput:
-    preference = inp.sugar_preference.lower()
-    if preference not in SUGAR_AMOUNTS:
-        raise ApplicationError(
-            f"Unknown sugar preference: {inp.sugar_preference}. "
-            f"Use one of: {', '.join(sorted(SUGAR_AMOUNTS.keys()))}.",
-            non_retryable=True,
-        )
-    amount = SUGAR_AMOUNTS[preference]
-    note = SUGAR_NOTES_TEMPLATE[preference].format(amount=amount)
-
-    method = inp.brew_method.lower()
-    if preference != "none" and preference in NOT_RECOMMENDED_SUGAR.get(method, []):
-        note += " Note: honey can be difficult to dissolve in cold brew; consider simple syrup instead."
-
-    return AddSugarOutput(sugar_type=preference, amount_tsp=amount, notes=note)
-
 # ── Choose milk ───────────────────────────────────────────────────────────────
 
 MILK_AMOUNTS = {
