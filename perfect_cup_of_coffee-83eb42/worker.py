@@ -4,7 +4,7 @@ from temporalio.client import Client
 from workflow import PerfectCupOfCoffeeWorkflow
 from activities import (
     select_beans, grind_beans, heat_water, prep_brewer,
-    dose_coffee, bloom_pour, main_brew, taste_eval,
+    dose_coffee, bloom_pour, main_brew, taste_eval, choose_milk,
 )
 
 async def main():
@@ -15,7 +15,7 @@ async def main():
         workflows=[PerfectCupOfCoffeeWorkflow],
         activities=[
             select_beans, grind_beans, heat_water, prep_brewer,
-            dose_coffee, bloom_pour, main_brew, taste_eval,
+            dose_coffee, bloom_pour, main_brew, taste_eval, choose_milk,
         ],
     )
     await worker.run()
