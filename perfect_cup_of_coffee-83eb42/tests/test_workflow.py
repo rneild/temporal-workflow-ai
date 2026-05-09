@@ -4,11 +4,11 @@ from workflow import PerfectCupOfCoffeeWorkflow, BrewRequest, BrewLog
 from activities import (
     SelectBeansOutput, GrindBeansOutput, HeatWaterOutput,
     PrepBrewerOutput, DoseCoffeeOutput, BloomPourOutput,
-    MainBrewOutput, TasteEvalOutput, AddSugarOutput, ChooseMilkOutput,
+    MainBrewOutput, TasteEvalOutput, ChooseMilkOutput,
 )
 
 @pytest.mark.asyncio
-async def test_perfect_cup_with_brown_sugar_and_oat_milk():
+async def test_perfect_cup_with_oat_milk():
     req = BrewRequest(
         brew_method="pour_over",
         bean_origin="Ethiopia Yirgacheffe",
@@ -16,7 +16,6 @@ async def test_perfect_cup_with_brown_sugar_and_oat_milk():
         dose_grams=20.0,
         water_ml=320.0,
         milk_preference="oat",
-        sugar_preference="brown",
     )
 
     mock_select  = AsyncMock(return_value=SelectBeansOutput(freshness_ok=True, notes="Fresh beans"))
@@ -30,11 +29,6 @@ async def test_perfect_cup_with_brown_sugar_and_oat_milk():
         flavour_notes="pour_over at 96C, medium-fine, 1:16.0",
         balance="balanced",
         recommendation="No changes needed — enjoy!",
-    ))
-    mock_sugar   = AsyncMock(return_value=AddSugarOutput(
-        sugar_type="brown",
-        amount_tsp=1.0,
-        notes="Add 1.0 tsp brown sugar for a subtle molasses depth. Stir well.",
     ))
     mock_milk    = AsyncMock(return_value=ChooseMilkOutput(
         milk_type="oat",
@@ -51,20 +45,17 @@ async def test_perfect_cup_with_brown_sugar_and_oat_milk():
          patch("workflow.bloom_pour",   mock_bloom), \
          patch("workflow.main_brew",    mock_brew), \
          patch("workflow.taste_eval",   mock_taste), \
-         patch("workflow.add_sugar",    mock_sugar), \
          patch("workflow.choose_milk",  mock_milk):
 
         wf = PerfectCupOfCoffeeWorkflow()
         result = await wf.run(req)
 
     assert isinstance(result, BrewLog)
-    assert result.sugar_type == "brown"
-    assert result.sugar_amount_tsp == 1.0
     assert result.milk_type == "oat"
     assert result.balance == "balanced"
 
 @pytest.mark.asyncio
-async def test_perfect_cup_no_sugar_no_milk():
+async def test_perfect_cup_no_milk():
     req = BrewRequest(
         brew_method="pour_over",
         bean_origin="Kenya AA",
@@ -72,7 +63,6 @@ async def test_perfect_cup_no_sugar_no_milk():
         dose_grams=20.0,
         water_ml=320.0,
         milk_preference="none",
-        sugar_preference="none",
     )
 
     mock_select  = AsyncMock(return_value=SelectBeansOutput(freshness_ok=True, notes="Fresh"))
@@ -86,11 +76,6 @@ async def test_perfect_cup_no_sugar_no_milk():
         flavour_notes="pour_over at 93C, medium-fine, 1:16.0",
         balance="balanced",
         recommendation="No changes needed — enjoy!",
-    ))
-    mock_sugar   = AsyncMock(return_value=AddSugarOutput(
-        sugar_type="none",
-        amount_tsp=0.0,
-        notes="No sugar — serve as is.",
     ))
     mock_milk    = AsyncMock(return_value=ChooseMilkOutput(
         milk_type="none",
@@ -107,13 +92,10 @@ async def test_perfect_cup_no_sugar_no_milk():
          patch("workflow.bloom_pour",   mock_bloom), \
          patch("workflow.main_brew",    mock_brew), \
          patch("workflow.taste_eval",   mock_taste), \
-         patch("workflow.add_sugar",    mock_sugar), \
          patch("workflow.choose_milk",  mock_milk):
 
         wf = PerfectCupOfCoffeeWorkflow()
         result = await wf.run(req)
 
-    assert result.sugar_type == "none"
-    assert result.sugar_amount_tsp == 0.0
     assert result.milk_type == "none"
     assert result.milk_amount_ml == 0.0
