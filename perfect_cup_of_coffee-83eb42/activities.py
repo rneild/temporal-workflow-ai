@@ -314,7 +314,6 @@ async def add_sugar(inp: AddSugarInput) -> AddSugarOutput:
     amount = SUGAR_AMOUNTS[preference]
     note = SUGAR_NOTES_TEMPLATE[preference].format(amount=amount)
 
-    # Method-specific advisory
     method = inp.brew_method.lower()
     if preference != "none" and preference in NOT_RECOMMENDED_SUGAR.get(method, []):
         note += " Note: honey can be difficult to dissolve in cold brew; consider simple syrup instead."
