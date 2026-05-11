@@ -7,7 +7,7 @@
 | Name | Description | Trigger | Task Queue | Deployed | Docs |
 |------|-------------|---------|------------|----------|------|
 | [hello-world](hello-world-fbb969/) | — | adhoc | `tq-hello-world-fbb969` | — | [README.md](hello-world-fbb969/README.md) |
-| [perfect_cup_of_coffee](perfect_cup_of_coffee-83eb42/) | Step-by-step coffee brewing workflow from bean selection through to milk choice, producing a structured BrewLog. | adhoc | `tq-perfect_cup_of_coffee-83eb42` | 2026-05-09 | [README.md](perfect_cup_of_coffee-83eb42/README.md) |
+| [perfect_cup_of_coffee](perfect_cup_of_coffee-83eb42/) | Guides a barista through every brewing step and returns a structured BrewLog with taste-balance assessment and dialling-in recommendation. | adhoc | `tq-perfect_cup_of_coffee-83eb42` | 2026-05-11 | [README.md](perfect_cup_of_coffee-83eb42/README.md) |
 | [simple-greeter](simple-greeter-324664/) | — | adhoc | `tq-simple-greeter-324664` | — | [README.md](simple-greeter-324664/README.md) |
 
 ## Workflow Details
@@ -28,15 +28,15 @@
 
 ### [perfect_cup_of_coffee](perfect_cup_of_coffee-83eb42/)
 
-Step-by-step coffee brewing workflow from bean selection through to milk choice, producing a structured BrewLog.
+Guides a barista through every brewing step and returns a structured BrewLog with taste-balance assessment and dialling-in recommendation.
 
 | | |
 |---|---|
 | **ID** | `perfect_cup_of_coffee-83eb42` |
 | **Trigger** | adhoc |
 | **Task Queue** | `tq-perfect_cup_of_coffee-83eb42` |
-| **Integrations** | none |
-| **Deployed** | 2026-05-09 |
+| **Integrations** | `temporalio` |
+| **Deployed** | 2026-05-11 |
 
 **Files:** [workflow.py](perfect_cup_of_coffee-83eb42/workflow.py) · [activities.py](perfect_cup_of_coffee-83eb42/activities.py) · [worker.py](perfect_cup_of_coffee-83eb42/worker.py) · [README.md](perfect_cup_of_coffee-83eb42/README.md)
 
@@ -78,6 +78,6 @@ Every workflow directory follows the same layout:
 | **Temporal address** | `us-west-2.api.temporal.io:7233` |
 | **AWS region** | `us-east-1` |
 | **GitHub repo** | `rneild/temporal-workflow-ai` |
-| **README last updated** | 2026-05-09 |
+| **README last updated** | 2026-05-11 |
 
 > Workflow files are managed by ATB. To modify a workflow, use the ATB tool in Claude Desktop — read the workflow's `README.md` first to understand constraints before changing anything.
