@@ -26,4 +26,6 @@ jobs:
           aws lambda update-function-code \
             --function-name atb-perfect_cup_of_coffee-83eb42 \
             --zip-file fileb://perfect_cup_of_coffee-83eb42.zip
-          aws lambda publish-version --function-name atb-perfect_cup_of_coffee-83eb42
+          VERSION=$(aws lambda publish-version --function-name atb-perfect_cup_of_coffee-83eb42 --query Version --output text)
+          aws lambda update-alias --function-name atb-perfect_cup_of_coffee-83eb42 --name LIVE --function-version $VERSION 2>/dev/null || \
+            aws lambda create-alias --function-name atb-perfect_cup_of_coffee-83eb42 --name LIVE --function-version $VERSION
